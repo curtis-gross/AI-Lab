@@ -1,0 +1,13 @@
+{
+  "name": "BIGCO",
+  "colors": {
+    "primaryDark": "#1f2937",
+    "secondaryLight": "#f8f8f5"
+  },
+  "guidelines": "dark, ominous",
+  "logos": {
+    "dark": "logo_dark.png",
+    "light": "logo_light.png"
+  },
+  "updatedAt": "2026-01-29T18:26:10.178Z"
+}

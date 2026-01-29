@@ -1,0 +1,13 @@
+{
+  "name": "smallco",
+  "colors": {
+    "primaryDark": "#373d3d",
+    "secondaryLight": "#F1EFDE"
+  },
+  "guidelines": "cheerful, natural",
+  "logos": {
+    "dark": "logo_dark.png",
+    "light": "logo_light.png"
+  },
+  "updatedAt": "2026-01-29T18:26:54.018Z"
+}
