@@ -99,7 +99,32 @@ To run the app on your machine:
 
 ---
 
-## 4. Deployment to Cloud Run
+## 4. Powering Google Antigravity (Bypassing Quotas)
+
+To use your own Google Cloud Project or AI Studio API Key to power Google Antigravity (and bypass the standard user quotas), there is a slight "official vs. manual" distinction you need to know.
+
+While Antigravity defaults to your Google account's subscription quota (like AI Pro or Ultra), you can indeed configure it to use a pay-as-you-go API key to ensure you don't hit the 5-hour refresh caps.
+
+### 1. Connecting via AI Studio API Key (Pay-as-you-go)
+If you want to use your AI Studio key to access "unlimited" (paid) quota, you can override the default provider.
+
+*   **Step 1:** Go to [Google AI Studio](https://aistudio.google.com/) and create an API Key. Ensure it is linked to a Google Cloud Project with billing enabled if you want to exceed the free-tier rate limits.
+*   **Step 2:** In Antigravity, go to Settings (`Cmd+,` or `Ctrl+,`) and search for "Models" or "Providers".
+*   **Step 3:** Select "Google AI Studio" as the provider.
+*   **Step 4:** Paste your API key.
+*   **Step 5: Manual Model ID:** In some preview versions, you may need to manually type the Model ID into the selection box to use the newest versions. For the current flagship, use: `gemini-3-pro-preview` or `gemini-3-flash-preview`.
+
+### 2. Connecting to a Google Cloud Project (Vertex AI)
+To use your Google Cloud (GCP) Project credits or enterprise quota via Vertex AI, the process is slightly different as it uses IAM instead of a simple API key.
+
+*   **Authentication:** Ensure you have the Google Cloud SDK installed on your machine and run `gcloud auth application-default login`.
+*   **Configuration:** In Antigravity settings, choose "Vertex AI" as the model provider.
+*   **Project ID:** Enter your GCP Project ID. The IDE will use your local gcloud credentials to authenticate.
+*   **Quota:** This will pull from your GCP project's Vertex AI quota. If you have high-tier support or a committed use discount on GCP, this is the most "limitless" way to run the IDE.
+
+---
+
+## 5. Deployment to Cloud Run
 
 Deploying makes the application live on the internet (or your internal network).
 
