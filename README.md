@@ -136,14 +136,11 @@ Store the API Key in the cloud so the app can access it securely.
     gcloud auth login
     gcloud config set project <YOUR_PROJECT_ID>
     ```
-2.  Create the secret (if it doesn't exist) and add the key version:
+2.  Run the setup script:
     ```bash
-    # Create the secret container
-    gcloud secrets create GEMINI_API_KEY --replication-policy="automatic"
-
-    # Add the actual key value
-    echo -n "YOUR_ACTUAL_API_KEY_STRING" | gcloud secrets versions add GEMINI_API_KEY --data-file=-
+    ./setup_api_key.sh
     ```
+    Follow the prompts to paste your Gemini API Key (input will be hidden).
 
 ### Step 2: Deploy the Application
 Run this command from the `AI-Lab` folder to build and deploy:
