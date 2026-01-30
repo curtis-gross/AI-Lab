@@ -73,7 +73,7 @@ Each developer should follow these steps to run the app locally and deploy chang
 1.  Clone the repository:
     ```bash
     git clone <your-repo-url>
-    cd demo-app
+    cd AI-Lab
     ```
 2.  Install dependencies:
     ```bash
@@ -121,7 +121,7 @@ Store the API Key in the cloud so the app can access it securely.
     ```
 
 ### Step 2: Deploy the Application
-Run this command from the `demo-app` folder to build and deploy:
+Run this command from the `AI-Lab` folder to build and deploy:
 
 ```bash
 gcloud run deploy ai-lab-deal-gen \
