@@ -11,6 +11,7 @@ app.use(express.json({ limit: '50mb' }));
 const port = process.env.PORT || 8080;
 
 console.log(`Starting server configuration. Port: ${port}`);
+console.log("GEMINI_API_KEY present in env:", !!process.env.GEMINI_API_KEY);
 
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
@@ -100,7 +101,7 @@ app.get('/api/admin/company/:id/logo/:filename', (req, res) => {
 // Save Company
 app.post('/api/admin/company', (req, res) => {
   try {
-    const { name, colors, guidelines, logos } = req.body;
+    const { name, colors, guidelines, font, logos } = req.body;
 
     if (!name || !colors || !logos) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -134,6 +135,7 @@ app.post('/api/admin/company', (req, res) => {
       name,
       colors,
       guidelines,
+      font,
       logos: {
         dark: 'logo_dark.png',
         light: 'logo_light.png'
@@ -147,6 +149,103 @@ app.post('/api/admin/company', (req, res) => {
   } catch (error) {
     console.error('Error saving company:', error);
     res.status(500).json({ error: 'Failed to save company configuration' });
+  }
+});
+
+// --- History Routes (New) ---
+
+const historyDir = path.join(__dirname, 'storage', 'history');
+if (!fs.existsSync(historyDir)) {
+  fs.mkdirSync(historyDir, { recursive: true });
+}
+
+// Save History
+app.post('/api/history', (req, res) => {
+  try {
+    const item = req.body;
+    if (!item || !item.id) {
+      return res.status(400).json({ error: 'Invalid history item' });
+    }
+    const filePath = path.join(historyDir, `${item.id}.json`);
+    fs.writeFileSync(filePath, JSON.stringify(item, null, 2));
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error saving history:', error);
+    res.status(500).json({ error: 'Failed to save history' });
+  }
+});
+
+// List History
+app.get('/api/history', (req, res) => {
+  try {
+    const files = fs.readdirSync(historyDir).filter(f => f.endsWith('.json'));
+    const history = files.map(file => {
+      try {
+        const content = fs.readFileSync(path.join(historyDir, file), 'utf8');
+        return JSON.parse(content);
+      } catch (e) {
+        console.error(`Error reading history file ${file}:`, e);
+        return null;
+      }
+    }).filter(item => item !== null);
+
+    // Sort by timestamp descending
+    history.sort((a, b) => b.timestamp - a.timestamp);
+
+    res.json(history);
+  } catch (error) {
+    console.error('Error listing history:', error);
+    res.status(500).json({ error: 'Failed to list history' });
+  }
+});
+
+// Delete History
+app.delete('/api/history/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    // Basic sanitization
+    if (id.includes('..') || id.includes('/')) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    const filePath = path.join(historyDir, `${id}.json`);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: 'History item not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete history' });
+  }
+});
+
+// Update History (Rename)
+app.patch('/api/history/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tagline } = req.body;
+
+    if (id.includes('..') || id.includes('/')) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    const filePath = path.join(historyDir, `${id}.json`);
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const item = JSON.parse(content);
+
+      // Update fields
+      if (tagline !== undefined) item.tagline = tagline;
+
+      fs.writeFileSync(filePath, JSON.stringify(item, null, 2));
+      res.json({ success: true, item });
+    } else {
+      res.status(404).json({ error: 'History item not found' });
+    }
+  } catch (error) {
+    console.error('Error updating history:', error);
+    res.status(500).json({ error: 'Failed to update history' });
   }
 });
 

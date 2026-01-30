@@ -1,12 +1,35 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { brandConfig } from '../config';
-import { Sparkles, Megaphone, Zap } from 'lucide-react';
+import { Sparkles, Megaphone, Zap, ArrowRight, Trash2 } from 'lucide-react';
+import { HistoryItem } from '../types';
 
 interface HomeProps {
     setMode: (mode: any) => void;
+    setSelectedDealId: (id: string | null) => void;
 }
 
-export const Home: React.FC<HomeProps> = ({ setMode }) => {
+export const Home: React.FC<HomeProps> = ({ setMode, setSelectedDealId }) => {
+    const [history, setHistory] = useState<HistoryItem[]>([]);
+
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const res = await fetch('/api/history');
+                if (res.ok) {
+                    const data = await res.json();
+                    setHistory(data.slice(0, 5)); // Get top 5
+                }
+            } catch (e) {
+                console.error("Failed to fetch history", e);
+            }
+        };
+        fetchHistory();
+    }, []);
+
+    const handleViewHistory = (id: string) => {
+        setSelectedDealId(id);
+        setMode('HISTORY_VIEWER');
+    };
     return (
         <div className="max-w-7xl mx-auto">
             {/* Hero Section */}
@@ -117,7 +140,7 @@ export const Home: React.FC<HomeProps> = ({ setMode }) => {
                     <table className="w-full text-sm text-left">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th className="px-6 py-3 font-semibold">Channel</th>
+                                <th className="px-6 py-3 font-semibold">Deal Name</th>
                                 <th className="px-6 py-3 font-semibold">Processing Type</th>
                                 <th className="px-6 py-3 font-semibold">Assets Number</th>
                                 <th className="px-6 py-3 font-semibold">Date Created</th>
@@ -126,22 +149,41 @@ export const Home: React.FC<HomeProps> = ({ setMode }) => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {[1, 2, 3, 4, 5].map((_, i) => (
-                                <tr key={i} className="hover:bg-gray-50/50">
-                                    <td className="px-6 py-4 font-medium text-gray-900">
-                                        {i === 0 ? 'Paid Media' : 'Email'}
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-600">Resize</td>
-                                    <td className="px-6 py-4 text-gray-600">{i === 0 ? '12' : '10'}</td>
-                                    <td className="px-6 py-4 text-gray-600">00/00/0000</td>
-                                    <td className="px-6 py-4">
-                                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded border border-green-200">Completed</span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button className="text-[#1e6bb8] font-medium hover:underline">View</button>
+                            {history.length > 0 ? (
+                                history.map((item) => (
+                                    <tr key={item.id} className="hover:bg-gray-50/50">
+                                        <td className="px-6 py-4 font-medium text-gray-900">
+                                            {item.tagline}
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-600">
+                                            {item.activeTab === 'new' ? 'New Deal' : 'Product Deal'}
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-600">
+                                            {item.results.length} images ({item.companyCount} companies)
+                                        </td>
+                                        <td className="px-6 py-4 text-gray-600">
+                                            {new Date(item.timestamp).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded border border-green-200">Completed</span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button
+                                                onClick={() => handleViewHistory(item.id)}
+                                                className="text-[#1e6bb8] font-medium hover:underline flex items-center justify-end gap-1 w-full"
+                                            >
+                                                View <ArrowRight size={14} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                                        No recent history found. Generate some assets to get started!
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

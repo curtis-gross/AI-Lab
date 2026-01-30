@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { generateImageWithAssets } from '../services/geminiService';
-import { Upload, X, Image as ImageIcon, PlusCircle, Sun, Moon, Eye } from 'lucide-react';
-import { CompanyConfig } from '../types';
-
-interface GeneratedResult {
-    companyId: string;
-    companyName: string;
-    ratio: string;
-    imageUrl: string;
-}
+import { Upload, X, Image as ImageIcon, PlusCircle, Sun, Moon, Eye, History, Trash2, ArrowRight } from 'lucide-react';
+import { CompanyConfig, GeneratedResult, HistoryItem } from '../types';
 
 // Helper to fetch image URL to base64
 const fetchImageAsBase64 = async (url: string): Promise<string | null> => {
@@ -34,6 +27,8 @@ export const DealGenerator: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'new' | 'include_product'>('new');
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState('');
+    // History functionality is now handled via Home page and Deal Details
+    // We only need to save to history, not display it here.
 
     // Inputs
     const [tagline, setTagline] = useState("Instant savings on Valentine's Day items");
@@ -48,6 +43,22 @@ export const DealGenerator: React.FC = () => {
     useEffect(() => {
         fetchCompanies();
     }, []);
+
+
+
+    const saveToHistory = async (newItem: HistoryItem) => {
+        try {
+            await fetch('/api/history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newItem)
+            });
+        } catch (e) {
+            console.error("Failed to save history to server", e);
+        }
+    };
+
+
 
     const fetchCompanies = async () => {
         try {
@@ -92,6 +103,7 @@ export const DealGenerator: React.FC = () => {
         const ratios = ['1:1', '4:3', '16:9', '9:16'];
         const totalTasks = companies.length * ratios.length;
         let completed = 0;
+        const allResults: GeneratedResult[] = [];
 
         try {
             for (const company of companies) {
@@ -132,6 +144,7 @@ export const DealGenerator: React.FC = () => {
                         - Brand Name: "${company.name}"
                         - Primary Color: ${company.colors.primaryDark}
                         - Secondary Color: ${company.colors.secondaryLight}
+                        - Font Preference: ${company.font || "Standard commercial font"}
                         - Visual Style: ${company.guidelines || "Professional and clean commercial style."}
                         
                         **Logo Placement:**
@@ -162,10 +175,27 @@ export const DealGenerator: React.FC = () => {
                 const companyResults = await Promise.all(companyPrompts);
                 const valid = companyResults.filter((r): r is GeneratedResult => r !== null);
                 
+                allResults.push(...valid);
                 setResults(prev => [...prev, ...valid]);
                 
                 completed += ratios.length;
                 setProgress(`Completed ${completed} of ${totalTasks} images...`);
+            }
+
+            // Save to history
+            const newItem: HistoryItem = {
+                id: Date.now().toString(),
+                timestamp: Date.now(),
+                tagline,
+                activeTab: activeTab as 'new' | 'include_product',
+                results: allResults, // We need to capture the accumulated results
+                companyCount: companies.length
+            };
+
+            if (allResults.length > 0) {
+                saveToHistory(newItem);
+            } else {
+                console.warn("No results generated, skipping history save.");
             }
 
         } catch (error) {
@@ -202,6 +232,7 @@ export const DealGenerator: React.FC = () => {
                 >
                     <ImageIcon size={18} /> Include Product in Deal
                 </button>
+
             </div>
 
             {/* Tab Content */}
@@ -301,7 +332,6 @@ export const DealGenerator: React.FC = () => {
                     )}
                 </div>
 
-                {/* Output Column */}
                 <div className="lg:col-span-3 space-y-8">
                     {loading && (
                         <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg flex items-center gap-3">
@@ -315,44 +345,44 @@ export const DealGenerator: React.FC = () => {
                             const compResults = results.filter(r => r.companyId === company.id);
                             if (compResults.length === 0) return null;
 
-                            return (
-                                <div key={company.id} className="border-t border-gray-200 pt-8 first:border-0 first:pt-0">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                        <span className="w-2 h-8 rounded-full" style={{ backgroundColor: company.colors.primaryDark }}></span>
-                                        {company.name}
-                                    </h3>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        {compResults.map((res, idx) => (
-                                            <div key={idx} className="group relative">
-                                                <div className="bg-gray-100 rounded-lg overflow-hidden shadow-sm aspect-square flex items-center justify-center">
-                                                    <img src={res.imageUrl} alt={`${res.ratio}`} className="max-w-full max-h-full object-contain" />
+                                        return (
+                                            <div key={company.id} className="border-t border-gray-200 pt-8 first:border-0 first:pt-0">
+                                                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                                    <span className="w-2 h-8 rounded-full" style={{ backgroundColor: company.colors.primaryDark }}></span>
+                                                    {company.name}
+                                                </h3>
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    {compResults.map((res, idx) => (
+                                                        <div key={idx} className="group relative">
+                                                            <div className="bg-gray-100 rounded-lg overflow-hidden shadow-sm aspect-square flex items-center justify-center">
+                                                                <img src={res.imageUrl} alt={`${res.ratio}`} className="max-w-full max-h-full object-contain" />
+                                                            </div>
+                                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white rounded-lg gap-2">
+                                                                <span className="font-bold text-lg">{res.ratio}</span>
+                                                                <div className="flex gap-2">
+                                                                    <button
+                                                                        onClick={() => handlePreview(res.imageUrl)}
+                                                                        className="bg-white text-black p-2 rounded-full hover:bg-gray-200"
+                                                                        title="Preview in new tab"
+                                                                    >
+                                                                        <Eye size={16} />
+                                                                    </button>
+                                                                    <a
+                                                                        href={res.imageUrl}
+                                                                        download={`${company.name.replace(/\s+/g, '-')}_${res.ratio}.jpg`}
+                                                                        className="bg-white text-black px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-200"
+                                                                    >
+                                                                        Download
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <p className="text-xs text-center text-gray-500 mt-1 font-mono">{res.ratio}</p>
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white rounded-lg gap-2">
-                                                    <span className="font-bold text-lg">{res.ratio}</span>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handlePreview(res.imageUrl)}
-                                                            className="bg-white text-black p-2 rounded-full hover:bg-gray-200"
-                                                            title="Preview in new tab"
-                                                        >
-                                                            <Eye size={16} />
-                                                        </button>
-                                                        <a 
-                                                            href={res.imageUrl} 
-                                                            download={`${company.name.replace(/\s+/g,'-')}_${res.ratio}.jpg`}
-                                                            className="bg-white text-black px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-200"
-                                                        >
-                                                            Download
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <p className="text-xs text-center text-gray-500 mt-1 font-mono">{res.ratio}</p>
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        })
+                                        );
+                                    })
                     ) : (
                         !loading && (
                             <div className="h-96 flex flex-col items-center justify-center text-gray-400 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">

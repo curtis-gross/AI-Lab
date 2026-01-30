@@ -5,9 +5,10 @@
     "secondaryLight": "#f8f8f5"
   },
   "guidelines": "dark, ominous",
+  "font": "Sans Serif",
   "logos": {
     "dark": "logo_dark.png",
     "light": "logo_light.png"
   },
-  "updatedAt": "2026-01-29T18:26:10.178Z"
+  "updatedAt": "2026-01-30T20:37:21.163Z"
 }

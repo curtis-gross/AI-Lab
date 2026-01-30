@@ -27,6 +27,7 @@ export const AdminConsole: React.FC = () => {
   const [primaryDark, setPrimaryDark] = useState('#000000');
   const [secondaryLight, setSecondaryLight] = useState('#ffffff');
   const [guidelines, setGuidelines] = useState('');
+    const [font, setFont] = useState('');
   const [darkLogo, setDarkLogo] = useState<string | null>(null);
   const [lightLogo, setLightLogo] = useState<string | null>(null);
 
@@ -81,6 +82,7 @@ export const AdminConsole: React.FC = () => {
             name: compName,
             colors: { primaryDark, secondaryLight },
             guidelines,
+            font,
             logos: logosToSend
         };
         await fetch('/api/admin/company', {
@@ -125,6 +127,7 @@ export const AdminConsole: React.FC = () => {
                         setPrimaryDark(company.colors.primaryDark);
                         setSecondaryLight(company.colors.secondaryLight);
                         setGuidelines(company.guidelines);
+                        setFont(company.font || '');
                         setDarkLogo(company.logos.dark);
                         setLightLogo(company.logos.light);
                         setView('editor');
@@ -165,7 +168,7 @@ export const AdminConsole: React.FC = () => {
                     onClick={() => {
                         if (activeTab === 'companies') {
                             setEditingCompanyId(null);
-                            setCompName(''); setPrimaryDark('#000000'); setSecondaryLight('#ffffff'); setGuidelines(''); setDarkLogo(null); setLightLogo(null);
+                            setCompName(''); setPrimaryDark('#000000'); setSecondaryLight('#ffffff'); setGuidelines(''); setFont(''); setDarkLogo(null); setLightLogo(null);
                         } else {
                             setEditingTemplateId(null);
                             setTempName(''); setTempText(''); setTempImage(null);
@@ -269,6 +272,10 @@ export const AdminConsole: React.FC = () => {
                     </div>
                 </div>
                 <div className="mb-8">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Font</label>
+                          <input type="text" value={font} onChange={(e) => setFont(e.target.value)} className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. Playfair Display, Roboto, Futura..." />
+                      </div>
+                      <div className="mb-8">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Brand Guidelines</label>
                     <textarea value={guidelines} onChange={(e) => setGuidelines(e.target.value)} className="w-full h-48 rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe brand voice, tone, and visual style..." />
                 </div>

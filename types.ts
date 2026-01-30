@@ -1,7 +1,8 @@
 export enum AppMode {
   HOME = 'HOME',
   DEAL_GENERATOR = 'DEAL_GENERATOR',
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
+  HISTORY_VIEWER = 'HISTORY_VIEWER'
 }
 
 export interface CompanyConfig {
@@ -15,4 +16,21 @@ export interface CompanyConfig {
     light: string; // Base64 or URL
   };
   guidelines: string;
+  font?: string;
+}
+
+export interface GeneratedResult {
+  companyId: string;
+  companyName: string;
+  ratio: string;
+  imageUrl: string;
+}
+
+export interface HistoryItem {
+  id: string;
+  timestamp: number;
+  tagline: string;
+  activeTab: 'new' | 'include_product';
+  results: GeneratedResult[];
+  companyCount: number;
 }

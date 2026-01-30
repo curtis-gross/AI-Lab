@@ -7,8 +7,11 @@ import { AdminConsole } from './components/AdminConsole';
 import { Home } from './components/Home';
 import { Menu } from 'lucide-react';
 
+import { HistoryViewer } from './components/HistoryViewer';
+
 function App() {
   const [mode, setMode] = useState<AppMode>(AppMode.HOME);
+  const [selectedDealId, setSelectedDealId] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -19,13 +22,23 @@ function App() {
   const renderContent = () => {
     switch (mode) {
       case AppMode.HOME:
-        return <Home setMode={setMode} />;
+        return <Home setMode={setMode} setSelectedDealId={setSelectedDealId} />;
       case AppMode.DEAL_GENERATOR:
         return <DealGenerator />;
       case AppMode.ADMIN:
         return <AdminConsole />;
+      case AppMode.HISTORY_VIEWER:
+        return (
+          <HistoryViewer
+            dealId={selectedDealId}
+            onBack={() => {
+              setMode(AppMode.HOME);
+              setSelectedDealId(null);
+            }}
+          />
+        );
       default:
-        return <Home setMode={setMode} />;
+        return <Home setMode={setMode} setSelectedDealId={setSelectedDealId} />;
     }
   };
 
