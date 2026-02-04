@@ -2,7 +2,8 @@ export enum AppMode {
   HOME = 'HOME',
   DEAL_GENERATOR = 'DEAL_GENERATOR',
   ADMIN = 'ADMIN',
-  HISTORY_VIEWER = 'HISTORY_VIEWER'
+  HISTORY_VIEWER = 'HISTORY_VIEWER',
+  DEAL_RESIZER = 'DEAL_RESIZER'
 }
 
 export interface CompanyConfig {

@@ -3,6 +3,7 @@ import { brandConfig } from './config';
 import { AppMode } from './types';
 import { Navigation } from './components/Navigation';
 import { DealGenerator } from './components/DealGenerator';
+import { DealResizer } from './components/DealResizer';
 import { AdminConsole } from './components/AdminConsole';
 import { Home } from './components/Home';
 import { Menu } from 'lucide-react';
@@ -25,6 +26,8 @@ function App() {
         return <Home setMode={setMode} setSelectedDealId={setSelectedDealId} />;
       case AppMode.DEAL_GENERATOR:
         return <DealGenerator />;
+      case AppMode.DEAL_RESIZER:
+        return <DealResizer />;
       case AppMode.ADMIN:
         return <AdminConsole />;
       case AppMode.HISTORY_VIEWER:

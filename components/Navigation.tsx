@@ -6,7 +6,8 @@ import {
   Tag,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Layers
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -30,6 +31,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   const navItems = [
     { id: AppMode.HOME, label: 'Home', icon: Home },
     { id: AppMode.DEAL_GENERATOR, label: 'Deal Generator', icon: Tag },
+    { id: AppMode.DEAL_RESIZER, label: 'Deal Resizer', icon: Layers },
     { id: AppMode.ADMIN, label: 'Admin Console', icon: Settings },
   ];
 
