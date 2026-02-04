@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { brandConfig } from '../config';
 import { Sparkles, Megaphone, Zap, ArrowRight, Trash2 } from 'lucide-react';
 import { HistoryItem } from '../types';

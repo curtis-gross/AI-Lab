@@ -152,6 +152,28 @@ app.post('/api/admin/company', (req, res) => {
   }
 });
 
+// Delete Company
+app.delete('/api/admin/company/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    if (id.includes('..') || id.includes('/')) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    const companyPath = path.join(__dirname, 'storage', id);
+    if (fs.existsSync(companyPath)) {
+      fs.rmSync(companyPath, { recursive: true, force: true });
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: 'Company not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting company:', error);
+    res.status(500).json({ error: 'Failed to delete company' });
+  }
+});
+
+
 // --- History Routes (New) ---
 
 const historyDir = path.join(__dirname, 'storage', 'history');
@@ -302,7 +324,7 @@ app.get('/api/admin/template/:id/image/:filename', (req, res) => {
 // Save Template
 app.post('/api/admin/template', (req, res) => {
     try {
-        const { name, text, image } = req.body; // image is base64
+      const { name, text, image, analysis } = req.body; // image is base64
 
         if (!name || !text || !image) {
             return res.status(400).json({ error: 'Missing required fields' });
@@ -331,6 +353,7 @@ app.post('/api/admin/template', (req, res) => {
             name,
             text,
             image: imageName,
+          analysis: analysis || '',
             updatedAt: new Date().toISOString()
         };
 
@@ -341,6 +364,28 @@ app.post('/api/admin/template', (req, res) => {
         console.error('Error saving template:', error);
         res.status(500).json({ error: 'Failed to save template' });
     }
+});
+
+// Delete Template
+app.delete('/api/admin/template/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    // Basic sanitization
+    if (id.includes('..') || id.includes('/')) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    const templatePath = path.join(__dirname, 'storage', 'templates', id);
+    if (fs.existsSync(templatePath)) {
+      fs.rmSync(templatePath, { recursive: true, force: true });
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: 'Template not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting template:', error);
+    res.status(500).json({ error: 'Failed to delete template' });
+  }
 });
 
 

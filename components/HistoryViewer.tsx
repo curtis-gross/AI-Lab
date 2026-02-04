@@ -47,7 +47,19 @@ export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) 
     const fetchCompanies = async () => {
         try {
             const res = await fetch('/api/admin/companies');
-            if (res.ok) setCompanies(await res.json());
+            if (res.ok) {
+                const data = await res.json();
+                // Add virtual company for manual uploads (Deal Resizer)
+                data.push({
+                    id: 'manual_upload',
+                    name: 'Manual Upload',
+                    colors: { primaryDark: '#6b7280', secondaryLight: '#f3f4f6' },
+                    logos: { dark: '', light: '' },
+                    guidelines: '',
+                    font: 'sans-serif'
+                });
+                setCompanies(data);
+            }
         } catch (e) {
             console.error("Failed to fetch companies", e);
         }
@@ -90,8 +102,13 @@ export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) 
                 <div className="flex justify-between items-start">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${deal.activeTab === 'new' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'}`}>
-                                {deal.activeTab === 'new' ? 'New Deal' : 'Product Deal'}
+                            <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${deal.type === 'deal_resizer' ? 'bg-orange-100 text-orange-700' :
+                                deal.type === 'template_to_banner' ? 'bg-blue-100 text-blue-700' :
+                                    deal.activeTab === 'new' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'
+                                }`}>
+                                {deal.type === 'deal_resizer' ? 'Deal Resizer' :
+                                    deal.type === 'template_to_banner' ? 'Template to Banner' :
+                                        deal.activeTab === 'new' ? 'New Deal' : 'Product Deal'}
                             </span>
                             <span className="text-sm text-gray-500">
                                 {new Date(deal.timestamp).toLocaleString()}

@@ -7,7 +7,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Layers
+  Layers,
+  LayoutTemplate
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -32,6 +33,7 @@ export const Navigation: React.FC<NavigationProps> = ({
     { id: AppMode.HOME, label: 'Home', icon: Home },
     { id: AppMode.DEAL_GENERATOR, label: 'Deal Generator', icon: Tag },
     { id: AppMode.DEAL_RESIZER, label: 'Deal Resizer', icon: Layers },
+    { id: AppMode.TEMPLATE_TO_BANNER, label: 'Template to Banner', icon: LayoutTemplate },
     { id: AppMode.ADMIN, label: 'Admin Console', icon: Settings },
   ];
 

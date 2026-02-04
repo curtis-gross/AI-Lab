@@ -4,6 +4,7 @@ import { AppMode } from './types';
 import { Navigation } from './components/Navigation';
 import { DealGenerator } from './components/DealGenerator';
 import { DealResizer } from './components/DealResizer';
+import { TemplateToBanner } from './components/TemplateToBanner';
 import { AdminConsole } from './components/AdminConsole';
 import { Home } from './components/Home';
 import { Menu } from 'lucide-react';
@@ -28,6 +29,8 @@ function App() {
         return <DealGenerator />;
       case AppMode.DEAL_RESIZER:
         return <DealResizer />;
+      case AppMode.TEMPLATE_TO_BANNER:
+        return <TemplateToBanner />;
       case AppMode.ADMIN:
         return <AdminConsole />;
       case AppMode.HISTORY_VIEWER:

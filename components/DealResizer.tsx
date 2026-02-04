@@ -82,6 +82,28 @@ export const DealResizer: React.FC = () => {
             const valid = taskResults.filter((r): r is GeneratedResult => r !== null);
             setResults(valid);
 
+            // Save to history
+            if (valid.length > 0) {
+                const historyItem: any = {
+                    id: Date.now().toString(),
+                    timestamp: Date.now(),
+                    tagline: 'Resized Banner Upload',
+                    type: 'deal_resizer',
+                    results: valid,
+                    companyCount: 1
+                };
+
+                try {
+                    await fetch('/api/history', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(historyItem)
+                    });
+                } catch (e) {
+                    console.error("Failed to save history", e);
+                }
+            }
+
         } catch (error) {
             console.error("Resizing error:", error);
         } finally {

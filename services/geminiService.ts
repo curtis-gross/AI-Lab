@@ -116,12 +116,12 @@ export const generateImageWithAssets = async (
                     imageSize: "1K"
                     // outputMimeType removed as it is not supported
                 },
-                safetySettings: [
-                    { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'OFF' },
-                    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' },
-                    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'OFF' },
-                    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'OFF' }
-                ],
+                // safetySettings: [
+                //     { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'OFF' },
+                //     { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' },
+                //     { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'OFF' },
+                //     { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'OFF' }
+                // ],
             }
         });
 
@@ -133,6 +133,47 @@ export const generateImageWithAssets = async (
     } catch (error) {
         console.error("Error generating image with assets:", error);
         return null;
+    }
+};
+
+export const analyzeTemplateImage = async (base64Image: string): Promise<string> => {
+    try {
+        const apiKey = await getApiKey();
+        if (!apiKey) throw new Error("API key not found");
+
+        const client = new GoogleGenAI({ apiKey });
+
+        const prompt = `
+            Analyze this marketing template image for the purpose of recreating it with different branding.
+            
+            Provide a structured description focusing on:
+            1. **Layout & Zoning:** Describe the exact position and RELATIVE SIZE of all text areas (e.g., "Large header spanning top 20% height", "Small footer bar at bottom 10%").
+            2. **Text Containers:** Note if text has a solid, transparent, or semi-transparent background.
+            3. **Buttons:** Describe the exact location, shape, and current color of any buttons.
+            4. **Visual Hierarchy:** specific font weights or styles used (e.g., "Extra bold headline", "Light body text").
+            
+            Your analysis will be used to instruct an AI to regenerate this exact layout but with different colors and fonts. Be precise about the "containers" that need to be preserved.
+        `;
+
+        const response = await client.models.generateContent({
+            model: "gemini-1.5-flash",
+            contents: [{
+                role: "user",
+                parts: [
+                    { text: prompt },
+                    { inlineData: { mimeType: "image/png", data: base64Image } }
+                ]
+            }]
+        });
+
+        // Safe extraction of text
+        const candidate = response?.candidates?.[0];
+        const textPart = candidate?.content?.parts?.find((p: any) => p.text);
+        return textPart ? textPart.text : "Analysis failed to produce text.";
+
+    } catch (error) {
+        console.error("Gemini Analysis Error:", error);
+        return "Failed to analyze template.";
     }
 };
 
