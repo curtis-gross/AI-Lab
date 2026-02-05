@@ -12,6 +12,8 @@ const getApiKey = (): Promise<string> => {
     apiKeyPromise = (async () => {
         try {
             // Priority 1: Check environment variable (injected by Vite)
+            // Note: you can also switch this to load the client with vertexai=true, but as long
+            // As you are connected to a paid project, you are good either way.
             if (process.env.GEMINI_API_KEY) {
                 cachedApiKey = process.env.GEMINI_API_KEY;
                 return process.env.GEMINI_API_KEY;
