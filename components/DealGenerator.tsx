@@ -35,6 +35,7 @@ export const DealGenerator: React.FC = () => {
     const [customBgPrompt, setCustomBgPrompt] = useState('Valentines day lunch setting in a kitchen');
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
+    const [logoPosition, setLogoPosition] = useState<number>(8); // Default: Bottom Right
 
     // Data
     const [companies, setCompanies] = useState<(CompanyConfig & { id: string })[]>([]);
@@ -45,6 +46,15 @@ export const DealGenerator: React.FC = () => {
     }, []);
 
 
+
+    const getLogoPositionDescription = (index: number) => {
+        const positions = [
+            "top left corner", "top center edge", "top right corner",
+            "center left edge", "center of the image", "center right edge",
+            "bottom left corner", "bottom center edge", "bottom right corner"
+        ];
+        return positions[index] || "bottom right corner";
+    };
 
     const saveToHistory = async (newItem: HistoryItem) => {
         try {
@@ -150,7 +160,7 @@ export const DealGenerator: React.FC = () => {
                         **Logo Placement:**
                         - I have provided the ${company.name} logo as an input image. 
                         - You MUST composite this logo into the final image.
-                        - Place the logo tastefully in a corner or appropriate branding area.
+                        - Place the logo specifically in the ${getLogoPositionDescription(logoPosition)}.
                         - Ensure the logo is legible against the ${themeMode} background.
                         ${activeTab === 'include_product' ? '- The first input image is the PRODUCT. The second input image is the LOGO.' : '- The input image provided is the LOGO.'}
                     `;
@@ -276,6 +286,27 @@ export const DealGenerator: React.FC = () => {
                             className="w-full rounded-lg border-2 border-gray-300 px-4 py-3 text-sm focus:border-blue-900 focus:outline-none h-24 resize-none"
                             placeholder="e.g. Valentines day lunch setting in a kitchen"
                         />
+                    </div>
+
+                    {/* Logo Position Selector */}
+                    <div className="mb-6">
+                        <h3 className="text-sm font-bold text-gray-700 mb-2 uppercase">Logo Position</h3>
+                        <div className="grid grid-cols-3 gap-2 w-32 mx-auto">
+                            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setLogoPosition(index)}
+                                    className={`w-8 h-8 rounded border flex items-center justify-center transition-all ${logoPosition === index
+                                            ? 'bg-blue-900 border-blue-900 ring-2 ring-blue-300'
+                                            : 'bg-gray-50 border-gray-300 hover:bg-gray-200'
+                                        }`}
+                                    title={getLogoPositionDescription(index)}
+                                >
+                                    <div className={`w-2 h-2 rounded-full ${logoPosition === index ? 'bg-white' : 'bg-gray-400'}`} />
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-xs text-center text-gray-500 mt-2 capitalize">{getLogoPositionDescription(logoPosition)}</p>
                     </div>
 
                     {/* Theme Selection */}
