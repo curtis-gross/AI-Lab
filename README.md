@@ -146,15 +146,49 @@ Store the API Key in the cloud so the app can access it securely.
 Run this command from the `AI-Lab` folder to build and deploy:
 
 ```bash
-gcloud run deploy ai-lab-deal-gen \
-  --source . \
-  --platform managed \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest
+./cloud_run.sh
 ```
 
 *   **`--allow-unauthenticated`**: Makes the app public. Remove this flag to require Google IAM authentication (internal only).
 *   **`--set-secrets`**: Injects the API key from Secret Manager.
 
 Once complete, the terminal will show a **Service URL**. Click it to view your live AI Lab.
+## 6. Troubleshooting
+
+### Permission Errors during Setup (`setup_api_key.sh`)
+**Issue**: The script fails with `Permission denied` or `secretmanager.secrets.create` error.
+**Solution**: You need the **Secret Manager Admin** (`roles/secretmanager.admin`) role, or at minimum:
+- `roles/secretmanager.secretAccessor`
+- `roles/secretmanager.secretVersionManager`
+- `roles/secretmanager.viewer`
+
+If you are the owner, ensure the API is enabled: `gcloud services enable secretmanager.googleapis.com`
+
+### Cloud Run Deployment Errors
+
+#### `iam.serviceaccounts.actAs` permission denied
+**Error**: `Permission 'iam.serviceaccounts.actAs' denied on service account...`
+**Solution**: Grant yourself the **Service Account User** (`roles/iam.serviceAccountUser`) role on the project.
+```bash
+gcloud projects add-iam-policy-binding <PROJECT_ID> \
+    --member="user:<YOUR_EMAIL>" \
+    --role="roles/iam.serviceAccountUser"
+```
+
+#### Artifact Registry / Repo Admin Errors
+**Error**: `roles/artifactregistry.repoAdmin required`
+**Solution**: Grant **Artifact Registry Repository Administrator** (`roles/artifactregistry.repoAdmin`) to your user so it can create the container repository if it doesn't exist.
+
+#### Storage Admin Errors
+**Error**: `roles/storage.admin since the deploy will create a bucket`
+**Solution**: Grant **Storage Admin** (`roles/storage.admin`) or ensure the Cloud Build staging bucket exists.
+
+#### Cloud Build Permissions
+**Error**: `roles/cloudbuild.builds.editor since the command will kick off a cloud build job`
+**Solution**: Grant **Cloud Build Editor** (`roles/cloudbuild.builds.editor`).
+
+### Multi-User Secret Conflicts
+**Issue**: Multiple developers overwriting the same `GEMINI_API_KEY` secret.
+**Solution**: The setup scripts now support **namespacing**.
+1. When running `./setup_api_key.sh`, assume the default `<USER>` suffix or type a custom name.
+2. When running `./cloud_run.sh`, ensure you target that specific secret name.
