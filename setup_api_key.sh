@@ -5,6 +5,7 @@
 
 echo "Setting up Gemini API Key in Google Cloud Secret Manager..."
 echo "NOTE: You need 'Secret Manager Admin' or equivalent permissions to create secrets."
+echo "NOTE: This step is great for getting your app running, but not required for development."
 
 # Default secret name with user suffix to avoid collisions in shared projects
 # We use 'tr' to ensure the username is safe for Secret Manager naming conventions (alphanumeric, dashes, underscores)
