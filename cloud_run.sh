@@ -3,7 +3,7 @@
 # Configuration
 # CHANGE THIS TO YOUR APP NAME
 SERVICE_NAME="ailab"
-REGION="us-central1"
+REGION="us-west2"
 
 echo "Deploying $SERVICE_NAME to Cloud Run..."
 

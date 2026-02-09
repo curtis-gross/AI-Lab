@@ -21,7 +21,7 @@ echo "Using Secret Name: $SECRET_NAME"
 # Check if the secret already exists
 if ! gcloud secrets describe $SECRET_NAME > /dev/null 2>&1; then
   echo "Creating secret '$SECRET_NAME'..."
-  if ! gcloud secrets create $SECRET_NAME --replication-policy="automatic"; then
+  if ! gcloud secrets create $SECRET_NAME --locations=us-west2 --replication-policy="user-managed"; then
       echo "ERROR: Failed to create secret. Please ensure you have 'Secret Manager Admin' role."
       echo "See TROUBLESHOOTING.md for more details."
       exit 1
