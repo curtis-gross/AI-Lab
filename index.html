@@ -5,14 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DG AI Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              albertsons: {
+                navy: '#001F3F',
+                blue: '#005C9D',
+                header: '#FFFFFF',
+                text: '#333333',
+                link: '#005C9D'
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
       body { font-family: 'Inter', sans-serif; }
       /* Custom scrollbar to keep it sleek */
       ::-webkit-scrollbar { width: 8px; }
       ::-webkit-scrollbar-track { background: #f1f1f1; }
-      ::-webkit-scrollbar-thumb { background: #004B8D; border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: #003d73; }
+      ::-webkit-scrollbar-thumb { background: #005C9D; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #004B8D; }
     </style>
   <script type="importmap">
 {

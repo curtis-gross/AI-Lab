@@ -19,7 +19,7 @@ export interface HistoryItem {
   id: string;
   timestamp: number;
   tagline: string;
-  type?: 'deal_generator' | 'deal_resizer' | 'template_to_banner' | 'YOUR_NEW_FEATURE'; // Add new type here
+  type?: 'image_generator' | 'image_resizer' | 'template_to_banner' | 'YOUR_NEW_FEATURE'; // Add new type here
   results: GeneratedResult[];
   // ...
 }

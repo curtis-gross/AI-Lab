@@ -1,35 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Eye, Download, Pencil, Check, X } from 'lucide-react';
+import { ArrowLeft, Eye, Download, Pencil, Check, X, Clock } from 'lucide-react';
 import { CompanyConfig, HistoryItem, GeneratedResult } from '../types';
 
 interface HistoryViewerProps {
-    dealId: string | null;
+    imageId: string | null;
     onBack: () => void;
 }
 
-export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) => {
-    const [deal, setDeal] = useState<HistoryItem | null>(null);
+export const HistoryViewer: React.FC<HistoryViewerProps> = ({ imageId, onBack }) => {
+    const [image, setImage] = useState<HistoryItem | null>(null);
     const [companies, setCompanies] = useState<(CompanyConfig & { id: string })[]>([]);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [editTagline, setEditTagline] = useState('');
 
     useEffect(() => {
-        if (deal) {
-            setEditTagline(deal.tagline);
+        if (image) {
+            setEditTagline(image.tagline);
         }
-    }, [deal]);
+    }, [image]);
 
     const handleSaveTitle = async () => {
-        if (!deal) return;
+        if (!image) return;
         try {
-            const res = await fetch(`/api/history/${deal.id}`, {
+            const res = await fetch(`/api/history/${image.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tagline: editTagline })
             });
             if (res.ok) {
-                setDeal({ ...deal, tagline: editTagline });
+                setImage({ ...image, tagline: editTagline });
                 setIsEditing(false);
             }
         } catch (e) {
@@ -39,17 +39,17 @@ export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) 
 
     useEffect(() => {
         fetchCompanies();
-        if (dealId) {
-            fetchDeal(dealId);
+        if (imageId) {
+            fetchImage(imageId);
         }
-    }, [dealId]);
+    }, [imageId]);
 
     const fetchCompanies = async () => {
         try {
             const res = await fetch('/api/admin/companies');
             if (res.ok) {
                 const data = await res.json();
-                // Add virtual company for manual uploads (Deal Resizer)
+                // Add virtual company for manual uploads (Image Resizer)
                 data.push({
                     id: 'manual_upload',
                     name: 'Manual Upload',
@@ -65,27 +65,27 @@ export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) 
         }
     };
 
-    const fetchDeal = async (id: string) => {
+    const fetchImage = async (id: string) => {
         try {
             // For now fetching all and filtering
             const res = await fetch('/api/history');
             if (res.ok) {
                 const history: HistoryItem[] = await res.json();
-                console.log("Fetching deal with ID:", id);
+                console.log("Fetching image with ID:", id);
                 console.log("Available history IDs:", history.map(h => h.id));
                 const found = history.find(h => h.id === id);
-                console.log("Found deal:", found);
-                setDeal(found || null);
+                console.log("Found image:", found);
+                setImage(found || null);
             }
         } catch (e) {
-            console.error("Failed to fetch deal", e);
+            console.error("Failed to fetch image", e);
         } finally {
             setLoading(false);
         }
     };
 
     if (loading) return <div className="p-8 text-center">Loading...</div>;
-    if (!deal) return <div className="p-8 text-center">Deal not found.</div>;
+    if (!image) return <div className="p-8 text-center">Image not found.</div>;
 
     const handlePreview = (url: string) => {
         const win = window.open();
@@ -95,23 +95,27 @@ export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) 
     return (
         <div className="max-w-7xl mx-auto">
             <button onClick={onBack} className="flex items-center text-gray-600 hover:text-gray-900 mb-6">
-                <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
+                <ArrowLeft size={20} className="mr-2" /> Back to History
             </button>
 
             <div className="bg-white rounded-xl p-6 shadow-sm mb-8 border border-gray-200">
                 <div className="flex justify-between items-start">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${deal.type === 'deal_resizer' ? 'bg-orange-100 text-orange-700' :
-                                deal.type === 'template_to_banner' ? 'bg-blue-100 text-blue-700' :
-                                    deal.activeTab === 'new' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'
+                            <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${image.status === 'processing' ? 'bg-blue-100 text-blue-700' :
+                                image.status === 'failed' ? 'bg-red-100 text-red-700' :
+                                    image.type === 'image_resizer' ? 'bg-orange-100 text-orange-700' :
+                                        image.type === 'template_to_banner' ? 'bg-blue-100 text-blue-700' :
+                                            image.activeTab === 'new' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'
                                 }`}>
-                                {deal.type === 'deal_resizer' ? 'Deal Resizer' :
-                                    deal.type === 'template_to_banner' ? 'Template to Banner' :
-                                        deal.activeTab === 'new' ? 'New Deal' : 'Product Deal'}
+                                {image.status === 'processing' ? 'Processing...' :
+                                    image.status === 'failed' ? 'Failed' :
+                                        image.type === 'image_resizer' ? 'Image Resizer' :
+                                            image.type === 'template_to_banner' ? 'Template to Banner' :
+                                                image.activeTab === 'new' ? 'New Image' : 'Product Image'}
                             </span>
                             <span className="text-sm text-gray-500">
-                                {new Date(deal.timestamp).toLocaleString()}
+                                {new Date(image.timestamp).toLocaleString()}
                             </span>
                         </div>
                         {isEditing ? (
@@ -132,7 +136,7 @@ export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) 
                                 <button
                                     onClick={() => {
                                         setIsEditing(false);
-                                        setEditTagline(deal.tagline);
+                                        setEditTagline(image.tagline);
                                     }}
                                     className="p-1 hover:bg-red-100 text-red-600 rounded"
                                 >
@@ -141,7 +145,7 @@ export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) 
                             </div>
                         ) : (
                             <div className="flex items-center gap-3">
-                                <h1 className="text-2xl font-bold text-gray-900">{deal.tagline}</h1>
+                                <h1 className="text-2xl font-bold text-gray-900">{image.tagline}</h1>
                                 <button
                                     onClick={() => setIsEditing(true)}
                                     className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -154,9 +158,25 @@ export const HistoryViewer: React.FC<HistoryViewerProps> = ({ dealId, onBack }) 
                 </div>
             </div>
 
+            {image.status === 'processing' && (
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-12 text-center">
+                    <Clock size={48} className="mx-auto mb-4 text-blue-400 animate-spin" />
+                    <h3 className="text-xl font-bold text-blue-800 mb-2">Job is Processing</h3>
+                    <p className="text-blue-600">This resize operation is still in progress. Results will appear here once finished.</p>
+                </div>
+            )}
+
+            {image.status === 'failed' && (
+                <div className="bg-red-50 border border-red-100 rounded-xl p-12 text-center">
+                    <X size={48} className="mx-auto mb-4 text-red-400" />
+                    <h3 className="text-xl font-bold text-red-800 mb-2">Operation Failed</h3>
+                    <p className="text-red-600">Something went wrong during the resizing process. Check logs for details.</p>
+                </div>
+            )}
+
             <div className="space-y-8">
                 {companies.map(company => {
-                    const compResults = deal.results.filter(r => r.companyId === company.id);
+                    const compResults = image.results.filter(r => r.companyId === company.id);
                     if (compResults.length === 0) return null;
 
                     return (

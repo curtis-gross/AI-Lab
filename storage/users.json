@@ -1,0 +1,18 @@
+[
+  {
+    "username": "admin",
+    "name": "Admin User",
+    "initials": "AD",
+    "password": "123654",
+    "role": "admin",
+    "createdAt": "2026-02-11T12:00:00.000Z"
+  },
+  {
+    "username": "kumar",
+    "name": "Kumar Anand",
+    "initials": "KA",
+    "password": "123456",
+    "role": "user",
+    "createdAt": "2026-02-12T01:31:21.182Z"
+  }
+]
