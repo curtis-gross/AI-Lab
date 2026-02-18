@@ -207,7 +207,7 @@ export const analyzeTemplateImage = async (base64Image: string): Promise<string>
         `;
 
         const response = await client.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-3-flash-preview", // Never Change this model from gemini-3-flash-preview
             contents: [{
                 role: "user",
                 parts: [
