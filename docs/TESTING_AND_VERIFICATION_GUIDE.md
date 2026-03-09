@@ -2,17 +2,17 @@
 
 This guide details the expected functionality and verification steps for each core feature of the AI Lab application. Use this to validate the system after any code changes.
 
-## 1. Image Generator (Legacy)
-**Objective:** Generate a structured spreadsheet of product images/deals from a raw text input.
+## 1. Deal Generator (Legacy)
+**Objective:** Generate a structured spreadsheet of product deals from a raw text input.
 
 ### Expected Functionality
 - **Input:** Accepts raw text (e.g., "Buy 2 get 1 free on Coke").
 - **Processing:** AI parses the text into a structured table (Product, Price, Promo, etc.).
-- **Output:** A downloadable CSV/Excel file or a table view of the items.
+- **Output:** A downloadable CSV/Excel file or a table view of the deals.
 - **Persistence:** Saving `[activeTab: 'new']` history items.
 
 ### Manual Test Steps
-1. Navigate to **Image Generator**.
+1. Navigate to **Deal Generator**.
 2. Enter text: `Coca-Cola 12pk $5.99 each when you buy 3`.
 3. Click "Generate".
 4. **Verify:** A table appears with "Coca-Cola" as the product and details extracted correctly.
@@ -20,21 +20,21 @@ This guide details the expected functionality and verification steps for each co
 
 ---
 
-## 2. Image Resizer
+## 2. Deal Resizer
 **Objective:** Upload a banner image and resize it into multiple social media aspect ratios (1:1, 9:16, 16:9, 4:5).
 
 ### Expected Functionality
 - **Input:** User uploads a single image (JPG/PNG).
 - **Processing:** System generates 4 variations (Square, Story, Landscape, Portrait).
 - **Output:** A grid of 4 resized images.
-- **Persistence:** Saves a history item with `type: 'image_resizer'` and `companyId: 'manual_upload'`.
+- **Persistence:** Saves a history item with `type: 'deal_resizer'` and `companyId: 'manual_upload'`.
 
 ### Manual Test Steps
-1. Navigate to **Image Resizer**.
+1. Navigate to **Deal Resizer**.
 2. Upload any image.
 3. Click "Generate Resizes".
 4. **Verify:** 4 images appear (1:1, 9:16, 16:9, 4:5).
-5. **Verify:** New entry in **History** labeled "Image Resizer".
+5. **Verify:** New entry in **History** labeled "Deal Resizer".
 6. **Verify:** Clicking the history item shows the "Manual Upload" section with the 4 images.
 
 ---
@@ -64,14 +64,14 @@ This guide details the expected functionality and verification steps for each co
 
 ### Expected Functionality
 - **Display:** Chronological list of all past runs.
-- **Filtering:** Validates `type` fields ('image_generator', 'image_resizer', 'template_to_banner') to show correct labels.
+- **Filtering:** Validates `type` fields ('deal_generator', 'deal_resizer', 'template_to_banner') to show correct labels.
 - **Detail View:** Clicking an item opens the detail grid.
-- **Persistence Check:** "Image Resizer" items must show under "Manual Upload".
+- **Persistence Check:** "Deal Resizer" items must show under "Manual Upload".
 
 ### Manual Test Steps
 1. Navigate to **History**.
-2. **Verify:** You see distinct badges for "Image Resizer", "Template to Banner", etc.
-3. Click the most recent "Image Resizer" item.
+2. **Verify:** You see distinct badges for "Deal Resizer", "Template to Banner", etc.
+3. Click the most recent "Deal Resizer" item.
 4. **Verify:** It opens and displays the "Manual Upload" section with images.
 5. Edit the title (pencil icon) -> rename to "Test Run" -> Click Check.
 6. **Verify:** Title updates and persists on refresh.

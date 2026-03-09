@@ -82,69 +82,19 @@ const extractImageFromResponse = (response: any): string | null => {
 /**
  * Generates an image using Gemini with flexible assets (logos, product images).
  */
-// Helper to parse ratio string "16:9" to number 1.77
-const parseRatio = (ratioStr: string): number => {
-    const [w, h] = ratioStr.split(':').map(Number);
-    if (!w || !h) return 1;
-    return w / h;
-};
-
-// Supported Gemini Image aspect ratios
-const SUPPORTED_RATIOS = [
-    { str: '1:1', val: 1 },
-    { str: '3:4', val: 0.75 },
-    { str: '4:3', val: 1.33 },
-    { str: '9:16', val: 0.56 },
-    { str: '16:9', val: 1.77 },
-    { str: '4:5', val: 0.8 },
-    { str: '5:4', val: 1.25 },
-    { str: '2:3', val: 0.66 },
-    { str: '3:2', val: 1.5 },
-    { str: '21:9', val: 2.33 }
-];
-
-const getClosestSupportedRatio = (targetRatioStr: string): string => {
-    // If it's already in the list (exact string match), return it
-    if (SUPPORTED_RATIOS.some(r => r.str === targetRatioStr)) return targetRatioStr;
-
-    const targetVal = parseRatio(targetRatioStr);
-
-    // Find closest
-    let closest = SUPPORTED_RATIOS[0];
-    let minDiff = Math.abs(targetVal - closest.val);
-
-    for (const ratio of SUPPORTED_RATIOS) {
-        const diff = Math.abs(targetVal - ratio.val);
-        if (diff < minDiff) {
-            minDiff = diff;
-            closest = ratio;
-        }
-    }
-
-    console.log(`Mapping unsupported ratio ${targetRatioStr} (${targetVal}) to ${closest.str} (${closest.val})`);
-    return closest.str;
-};
-
-/**
- * Generates an image using Gemini with flexible assets (logos, product images).
- */
 export const generateImageWithAssets = async (
-    prompt: string,
-    assets: { mimeType: string; data: string }[],
-    aspectRatio: string = "1:1",
+    prompt: string, 
+    assets: { mimeType: string; data: string }[], 
+    aspectRatio: string = "1:1", 
     model: string = "gemini-3-pro-image-preview"
-): Promise<{ imageBase64: string; usedRatio: string } | null> => {
+): Promise<string | null> => {
     try {
         const client = await getClient();
-
-        // Map to a supported ratio for the API config
-        const safeRatio = getClosestSupportedRatio(aspectRatio);
-
-        console.log(`Generating image. Model: ${model}. Target Ratio: ${aspectRatio} -> Safe API Ratio: ${safeRatio}.`);
+        console.log(`Generating image with ${assets.length} assets, model ${model}, ratio ${aspectRatio}. Prompt: ${prompt}`);
 
         // Construct parts array: [ {text: prompt}, {inlineData...}, {inlineData...} ]
         const parts: any[] = [{ text: prompt }];
-
+        
         assets.forEach(asset => {
             parts.push({
                 inlineData: {
@@ -161,23 +111,24 @@ export const generateImageWithAssets = async (
                 parts: parts
             }],
             config: {
-                // @ts-ignore
                 responseModalities: ["IMAGE", "TEXT"],
                 // @ts-ignore
                 imageConfig: {
-                    aspectRatio: safeRatio,
+                    aspectRatio: aspectRatio,
                     imageSize: "1K"
+                    // outputMimeType removed as it is not supported
                 },
+                // safetySettings: [
+                //     { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'OFF' },
+                //     { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' },
+                //     { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'OFF' },
+                //     { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'OFF' }
+                // ],
             }
         });
 
         const imageBase64 = extractImageFromResponse(response);
-        if (imageBase64) {
-            return {
-                imageBase64,
-                usedRatio: safeRatio
-            };
-        }
+        if (imageBase64) return imageBase64;
 
         console.warn("No image found in response parts.");
         return null;
@@ -207,7 +158,7 @@ export const analyzeTemplateImage = async (base64Image: string): Promise<string>
         `;
 
         const response = await client.models.generateContent({
-            model: "gemini-3-flash-preview", // Never Change this model from gemini-3-flash-preview
+            model: "gemini-1.5-flash",
             contents: [{
                 role: "user",
                 parts: [
@@ -232,14 +183,12 @@ export const analyzeTemplateImage = async (base64Image: string): Promise<string>
  * @deprecated Use generateImageWithAssets
  */
 export const generateImage = async (prompt: string, aspectRatio: string = "1:1"): Promise<string | null> => {
-    const result = await generateImageWithAssets(prompt, [], aspectRatio);
-    return result ? result.imageBase64 : null;
+    return generateImageWithAssets(prompt, [], aspectRatio);
 };
 
 /**
  * @deprecated Use generateImageWithAssets
  */
 export const generateImageWithReference = async (prompt: string, referenceImageBase64: string, aspectRatio: string = "1:1", mimeType: string = "image/png"): Promise<string | null> => {
-    const result = await generateImageWithAssets(prompt, [{ mimeType, data: referenceImageBase64 }], aspectRatio);
-    return result ? result.imageBase64 : null;
+    return generateImageWithAssets(prompt, [{ mimeType, data: referenceImageBase64 }], aspectRatio);
 };

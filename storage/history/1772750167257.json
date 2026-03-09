@@ -1,0 +1,57 @@
+{
+  "id": "1772750167257",
+  "timestamp": 1772750167257,
+  "tagline": "10% off your first online order",
+  "activeTab": "new",
+  "results": [
+    {
+      "companyId": "bigco",
+      "companyName": "BIGCO",
+      "ratio": "1:1",
+      "imageUrl": "/api/history/1772750167257/image/image_0.jpg"
+    },
+    {
+      "companyId": "bigco",
+      "companyName": "BIGCO",
+      "ratio": "4:3",
+      "imageUrl": "/api/history/1772750167257/image/image_1.jpg"
+    },
+    {
+      "companyId": "bigco",
+      "companyName": "BIGCO",
+      "ratio": "16:9",
+      "imageUrl": "/api/history/1772750167257/image/image_2.jpg"
+    },
+    {
+      "companyId": "bigco",
+      "companyName": "BIGCO",
+      "ratio": "9:16",
+      "imageUrl": "/api/history/1772750167257/image/image_3.jpg"
+    },
+    {
+      "companyId": "smallco",
+      "companyName": "smallco",
+      "ratio": "1:1",
+      "imageUrl": "/api/history/1772750167257/image/image_4.jpg"
+    },
+    {
+      "companyId": "smallco",
+      "companyName": "smallco",
+      "ratio": "4:3",
+      "imageUrl": "/api/history/1772750167257/image/image_5.jpg"
+    },
+    {
+      "companyId": "smallco",
+      "companyName": "smallco",
+      "ratio": "16:9",
+      "imageUrl": "/api/history/1772750167257/image/image_6.jpg"
+    },
+    {
+      "companyId": "smallco",
+      "companyName": "smallco",
+      "ratio": "9:16",
+      "imageUrl": "/api/history/1772750167257/image/image_7.jpg"
+    }
+  ],
+  "companyCount": 2
+}

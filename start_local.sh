@@ -12,7 +12,7 @@ if [ $? -eq 0 ]; then
   # Start the server
   # Fetch API Key from Secret Manager
   echo "Fetching API Key from Secret Manager..."
-  export GEMINI_API_KEY=$(gcloud secrets versions access latest --secret="GEMINI_API_KEY_hsant39")
+  export GEMINI_API_KEY=$(gcloud secrets versions access latest --secret="GEMINI_API_KEY")
   
   if [ -z "$GEMINI_API_KEY" ]; then
     echo "Error: GEMINI_API_KEY is empty. Check gcloud authentication and secret existence."

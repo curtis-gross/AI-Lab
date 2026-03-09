@@ -151,7 +151,7 @@ export const TemplateToBanner: React.FC = () => {
                     2. **TEXT SIZING:** Text MUST be sized to fit strictly within the original text boxes. Do not expand the boxes to fit the text. Shrink the text if necessary.
                     3. **BASE IMAGE:** The underlying image structure/composition MUST NOT CHANGE. Textures and lighting can be refined, but objects must not move.
                     4. **TEXT BACKGROUNDS:** IF the template has a solid background behind text, you MUST RECOLOR it using the **Company Primary Color** (${company.colors.primaryDark}) or **Secondary Color** (${company.colors.secondaryLight}).
-                    5. **FONTS:** Use the **Company Font** (${company.font || 'Modern Sans'}) for ALL text.
+                    5. **FONTS:** YOU MUST STRICTLY FOLLOW THIS FONT for ALL text: (${company.font || 'Modern Sans'}).
                     6. **BUTTONS:** Buttons must be the EXACT same size/shape as the template. Recolor them to the **Company Primary Color** (${company.colors.primaryDark}) or **Secondary Color**.
                     
                     **RESTRICTIONS:** 

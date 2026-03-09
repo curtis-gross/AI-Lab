@@ -2,20 +2,16 @@
 
 # Configuration
 # CHANGE THIS TO YOUR APP NAME
-SERVICE_NAME="ailab"
-REGION="us-west2"
+SERVICE_NAME="ailab-app"
+REGION="us-central1"
 
 echo "Deploying $SERVICE_NAME to Cloud Run..."
 
-# Default secret name logic matching setup_api_key.sh
-SAFE_USER=$(echo "$USER" | tr -cd 'a-zA-Z0-9_-')
-DEFAULT_SECRET_NAME="GEMINI_API_KEY_${SAFE_USER}"
-
-echo "Enter Secret Name to reference [Default: $DEFAULT_SECRET_NAME]:"
-read SECRET_NAME_INPUT
-SECRET_NAME=${SECRET_NAME_INPUT:-$DEFAULT_SECRET_NAME}
-
-echo "Using Secret: $SECRET_NAME"
+if [ -z "$GEMINI_API_KEY" ]; then
+  echo "Error: GEMINI_API_KEY environment variable is not set."
+  echo "Please export your API key first: export GEMINI_API_KEY='your_key'"
+  exit 1
+fi
 
 # Build and Deploy
 gcloud run deploy $SERVICE_NAME \
@@ -23,6 +19,6 @@ gcloud run deploy $SERVICE_NAME \
   --platform managed \
   --region $REGION \
   --allow-unauthenticated \
-  --set-secrets=GEMINI_API_KEY=$SECRET_NAME:latest
+  --set-env-vars=GEMINI_API_KEY=$GEMINI_API_KEY
 
 echo "Deployment complete."
